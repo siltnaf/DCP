@@ -1,0 +1,6 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make.exe: Entering directory 'c:/Users/yang3/Documents/PlatformIO/Projects/mm32f3273_pio_demo'
+make.exe: Leaving directory 'c:/Users/yang3/Documents/PlatformIO/Projects/mm32f3273_pio_demo'
+ 
+make.exe: *** No targets specified and no makefile found.  Stop.
+
