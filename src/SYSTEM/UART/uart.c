@@ -20,10 +20,10 @@
 
 // Files includes
 #include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
+#include <stdarg.h>			//? Add
 #include "uart.h"
 #include "hal_conf.h"
+#include "fonts.h"			//? Add
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @addtogroup MM32_Hardware_Abstract_Layer
@@ -37,28 +37,7 @@
 /// @addtogroup UART_Exported_Functions
 /// @{
 
-
-void vprint(const char *fmt, va_list argp)
-{
-    char string[200];
-    if(0 < vsprintf(string,fmt,argp)) // build string
-    {
-        for (int i = 0; i < strlen(string); i++) {
-            while ((UART1->CSR & UART_IT_TXIEN) == 0)
-                ; // The loop is sent until it is finished
-            UART1->TDR = (u8)string[i];
-        }
-    }
-}
-
-void my_printf(const char *fmt, ...) // custom printf() function
-{
-    va_list argp;
-    va_start(argp, fmt);
-    vprint(fmt, argp);
-    va_end(argp);
-}
-
+//#define PRINTF2UART
 
 #ifdef __GNUC__
 
@@ -83,9 +62,14 @@ void _sys_exit(s32 x)
 //redefine fputcfunction
 s32 fputc(s32 ch, FILE* f)
 {
-    while((UART1->CSR & UART_IT_TXIEN) == 0); //The loop is sent until it is finished
-    UART1->TDR = (ch & (u16)0x00FF);
+#ifdef PRINTF2UART
+    while((UART2->CSR & UART_IT_TXIEN) == 0); //The loop is sent until it is finished
+    UART2->TDR = (ch & (u16)0x00FF);
     return ch;
+#else
+		lcd_putch(ch);
+		return ch;
+#endif
 }
 
 #endif
@@ -94,40 +78,58 @@ s32 fputc(s32 ch, FILE* f)
 void CONSOLE_Init(u32 baudrate)
 {
     //GPIO port set
-    GPIO_InitTypeDef GPIO_InitStruct;
-    UART_InitTypeDef UART_InitStruct;
+    GPIO_InitTypeDef GPIO_InitStructure;
+    UART_InitTypeDef UART_InitStructure;
 
-    RCC_APB2PeriphClockCmd(RCC_APB2ENR_UART1, ENABLE);   //enableUART1,GPIOAclock
+    RCC_APB1PeriphClockCmd(RCC_APB1ENR_UART2, ENABLE);   //enableUART2,GPIOAclock
     RCC_AHBPeriphClockCmd(RCC_AHBENR_GPIOA, ENABLE);  //
     //UART initialset
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_1);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_1);
+    UART_StructInit(&UART_InitStructure);
+    UART_InitStructure.UART_BaudRate = baudrate;
+    UART_InitStructure.UART_WordLength = UART_WordLength_8b;
+    UART_InitStructure.UART_StopBits = UART_StopBits_1;//one stopbit
+    UART_InitStructure.UART_Parity = UART_Parity_No;//none odd-even  verify bit
+    UART_InitStructure.UART_HardwareFlowControl = UART_HardwareFlowControl_None;//No hardware flow control
+    UART_InitStructure.UART_Mode = UART_Mode_Rx | UART_Mode_Tx; // receive and sent  mode
 
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_7);
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_7);
+    UART_Init(UART2, &UART_InitStructure); //initial uart 2
+    UART_Cmd(UART2, ENABLE);                    //enable uart 2
 
+    //UART2_TX   GPIOA.2
+    GPIO_StructInit(&GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    UART_StructInit(&UART_InitStruct);
-    UART_InitStruct.UART_BaudRate = baudrate;
-    UART_InitStruct.UART_WordLength = UART_WordLength_8b;
-    UART_InitStruct.UART_StopBits = UART_StopBits_1;//one stopbit
-    UART_InitStruct.UART_Parity = UART_Parity_No;//none odd-even  verify bit
-    UART_InitStruct.UART_HardwareFlowControl = UART_HardwareFlowControl_None;//No hardware flow control
-    UART_InitStruct.UART_Mode = UART_Mode_Rx | UART_Mode_Tx; // receive and sent  mode
+    //UART2_RX    GPIOA.3
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;//GPIO_Mode_FLOATING;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    UART_Init(UART1, &UART_InitStruct); //initial uart 1
-    UART_Cmd(UART1, ENABLE);                    //enable uart 1
+}
 
-    //UART1_TX   GPIOA.9
-    GPIO_StructInit(&GPIO_InitStruct);
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStruct);
+void UART_printf(const char *pFormat, ...)
+{
+		char ch;
+		char pStr[80] = {'\0'}; 
+		u8 i=0;
+    va_list ap;
 
-    //UART1_RX    GPIOA.10
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(GPIOA, &GPIO_InitStruct);
-
+    // Forward call to vprintf
+    va_start(ap, pFormat);
+    vsprintf((char *)pStr, pFormat, ap);
+    va_end(ap);
+		
+		while (pStr[i] != 0)
+		{
+				ch = pStr[i];
+				while((UART2->CSR & UART_IT_TXIEN) == 0); //The loop is sent until it is finished
+				UART2->TDR = (ch & (u16)0x00FF);
+				i++;
+		}
 }
 
 /// @}

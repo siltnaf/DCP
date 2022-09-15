@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "TX16FULL.H": "cpp",
+        "TFX8FULL.H": "cpp",
+        "TFXICON.H": "cpp"
+    }
+}

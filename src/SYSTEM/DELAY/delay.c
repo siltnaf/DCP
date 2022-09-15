@@ -94,6 +94,27 @@ void DELAY_Ms(__IO u32 count)
 
     while(sTimingDelay != 0);
 }
+
+static __IO u32 sDelayNopNumber;
+////////////////////////////////////////////////////////////////////////////////
+/// @brief  Set the count as delay counter, it is break until counter goes to 0.
+/// @note   None.
+/// @param  count specifies the delay tick number
+/// @retval None.
+////////////////////////////////////////////////////////////////////////////////
+void DELAY_Us(__IO u32 count)
+{
+    u32 i = 0;
+		//GPIO_SetBits(GPIOB, GPIO_Pin_12);
+		//Custom
+    sDelayNopNumber = 0;
+
+    while(count--) {
+        i = sDelayNopNumber;
+        while(i--);
+    }
+		//GPIO_ResetBits(GPIOB, GPIO_Pin_12);
+}
 #else
 static __IO u32 sDelayNopNumber;
 ////////////////////////////////////////////////////////////////////////////////

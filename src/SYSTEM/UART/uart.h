@@ -71,6 +71,7 @@
 /// @{
 
 void CONSOLE_Init(u32 baudrate);
+void UART_printf(const char *pFormat, ...);
 
 
 /// @}

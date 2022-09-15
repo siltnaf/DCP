@@ -23,6 +23,7 @@
 // Files includes
 #include <string.h>
 #include "mm32_device.h"
+#include "hal_conf.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +91,7 @@
 
 void DELAY_Init(void);
 void DELAY_Ms(__IO u32 count);
-//void DELAY_Us(__IO u32 count);
+void DELAY_Us(__IO u32 count);
 
 /// @}
 

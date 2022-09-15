@@ -218,21 +218,21 @@ ErrorStatus SYSCLK_Init(SYSTEMCLK_TypeDef  system_clock_sel)
         }
         // Set PLL CLK source
         if (pllsrc == 1) {
-            RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC;
+            RCC->CFGR |= RCC_CFGR_PLLSRC;
             gSystemClockValue = CUSTOM_HSEFREQ;
         }
         else if (pllsrc == 2) {
-            RCC->PLLCFGR |= RCC_PLLCFGR_PLLXTPRE;
-            RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC;
+            RCC->CFGR |= RCC_CFGR_PLLXTPRE;
+            RCC->CFGR |= RCC_CFGR_PLLSRC;
             gSystemClockValue = CUSTOM_HSEFREQ / 2;
         }
         else {
-            RCC->CFGR &= ~RCC_PLLCFGR_PLLSRC;
-            gSystemClockValue = 8000000UL;
+            RCC->CFGR &= ~RCC_CFGR_PLLSRC;
+            gSystemClockValue = 12000000UL;
         }
         // Set PLL MUL and DIV
-        RCC->PLLCFGR |= (((u32)pllmul) << RCC_PLLCFGR_PLL_DN_Pos) & RCC_PLLCFGR_PLL_DN;   //
-        RCC->PLLCFGR |= (((u32)plldiv) << RCC_PLLCFGR_PLL_DP_Pos) & RCC_PLLCFGR_PLL_DP;   //
+        RCC->CR |= (((u32)pllmul) << RCC_CR_PLLMUL_Pos) & RCC_CR_PLLMUL;   // RCC_CR_PLLMUL
+        RCC->CR |= (((u32)plldiv) << RCC_CR_PLLDIV_Pos) & RCC_CR_PLLDIV;   // RCC_CR_PLLDIV
         RCC->CR |= RCC_CR_PLLON;
         gSystemClockValue = ( gSystemClockValue / ((u32)(((u32)plldiv) + 1)) ) * ((u32)(((u32)pllmul) + 1));
         // Set PLL ON and wait PLL ready
@@ -271,8 +271,7 @@ void RCC_SetDefault(void)
     CLEAR_BIT(RCC->CFGR, RCC_CFGR_SW);
 
 
-    CLEAR_BIT(RCC->CR, RCC_CR_HSEON | RCC_CR_CSSON | RCC_CR_PLLON );
-    CLEAR_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLL_DN | RCC_PLLCFGR_PLL_DP);//0x0018031C);//
+    CLEAR_BIT(RCC->CR, RCC_CR_HSEON | RCC_CR_CSSON | RCC_CR_PLLON | RCC_CR_PLLDIV | RCC_CR_PLLMUL);
     CLEAR_BIT(RCC->CR, RCC_CR_HSEBYP);
     CLEAR_REG(RCC->CFGR);
     CLEAR_REG(RCC->CIR);
