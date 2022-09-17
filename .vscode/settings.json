@@ -1,7 +1,5 @@
 {
-    "files.associations": {
-        "TX16FULL.H": "cpp",
-        "TFX8FULL.H": "cpp",
-        "TFXICON.H": "cpp"
-    }
+    "cortex-debug.gdbPath": "C:/Program Files/SEGGER/JLink",
+    "cortex-debug.JLinkGDBServerPath": "C:/Program Files/SEGGER/JLink/GDBServer",
+
 }
