@@ -23,6 +23,7 @@
 #include "hal_can.h"
 #include "canx.h"
 #include "can.h"
+#include "uart.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -288,7 +289,7 @@ void CAN_IRQHandler(void)
 void CAN_NVIC_Init(void)
 {
     CAN_GPIO_Config();
-    // Rate £ºCAN_250K   Mode£ºSpread spectrum double filtering  ID£º0x172,0x325
+    // Rate ï¿½ï¿½CAN_250K   Modeï¿½ï¿½Spread spectrum double filtering  IDï¿½ï¿½0x172,0x325
     //CAN_Config(CAN_250K, ExtendedFrame_DoubleFilter, 0x172, 0x325, 0x00, 0x00);
 		CAN_Config(CAN_250K, ExtendedFrame_SingleFilter, 0x1FFFFFFF, 0x00, 0x1FFFFFFF, 0x00);
 }

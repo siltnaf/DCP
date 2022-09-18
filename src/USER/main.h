@@ -8,7 +8,7 @@
 <!-- NOTES: -->
 
        \if ShowHist
-       Copyright © 2006 Teleflex Canada, Inc. All rights reserved.
+       Copyright ï¿½ 2006 Teleflex Canada, Inc. All rights reserved.
        This source file and the information contained in it are confidential and
        proprietary to Teleflex Canada, Inc. The reproduction or disclosure, in
        whole or in part, to anyone outside of Teleflex without the written
@@ -98,6 +98,8 @@
 #define MAIN_H
 //?#include <pic18.h>
 #include "tfxstddef.h"
+#include "uart.h"
+#include "delay.h"
 
 /* ---------- D e f i n i t i o n s ------------------------ */
 #define NO_DATA			0xFF

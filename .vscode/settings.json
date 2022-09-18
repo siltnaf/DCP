@@ -1,5 +1,6 @@
 {
     "cortex-debug.gdbPath": "C:/Program Files/SEGGER/JLink",
     "cortex-debug.JLinkGDBServerPath": "C:/Program Files/SEGGER/JLink/GDBServer",
+    "C_Cpp.errorSquiggles": "Disabled",
 
 }

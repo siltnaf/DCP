@@ -22,6 +22,7 @@
 // Files includes
 #include "delay.h"
 #include "i2c.h"
+#include "uart.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @addtogroup MM32_Hardware_Abstract_Layer

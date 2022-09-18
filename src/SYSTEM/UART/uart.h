@@ -70,8 +70,8 @@
 /// @defgroup MM32_Exported_Functions
 /// @{
 
-void CONSOLE_Init(u32 baudrate);
-void UART_printf(const char *pFormat, ...);
+extern void CONSOLE_Init(u32 baudrate);
+extern void UART_printf(const char *pFormat, ...);
 
 
 /// @}
